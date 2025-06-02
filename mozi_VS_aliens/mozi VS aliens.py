@@ -2,29 +2,39 @@ import pygame
 import sys
 import random
 import math
+import os
 from pygame.locals import *
 
 # 初始化pygame和混音器
 pygame.init()
 pygame.mixer.init()
 
+# 获取当前脚本所在目录
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
 # 屏幕设置
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("mozi VS alien")
 
-# 加载图像和音乐
+# 构建资源文件路径
+images_dir = os.path.join(script_dir, "images")
+music_dir = os.path.join(script_dir, "music")
+
+# 加载图像
 try:
-    # 使用提供的路径加载图像
-    player_img = pygame.image.load(r"\mozi_VS_aliens\images\mozi.bmp")
-    bullet_img = pygame.image.load(r"\mozi_VS_aliens\images\_20250601174837.bmp")
-    alien_img = pygame.image.load(r"\mozi_VS_aliens\images\c0f0b73eb8624eb8a1ea622842ddcf0f.bmp")
-    background_img = pygame.image.load(r"\mozi_VS_aliens\images\OIP-C.bmp")
-    title_img = pygame.image.load(r"\mozi_VS_aliens\images\OIP-C.bmp")  # 假设标题图片
+    # 使用相对路径加载图像
+    player_img = pygame.image.load(os.path.join(images_dir, "mozi.bmp"))
+    bullet_img = pygame.image.load(os.path.join(images_dir, "kuwu.bmp"))
+    alien_img = pygame.image.load(os.path.join(images_dir, "alien.bmp"))
+    background_img = pygame.image.load(os.path.join(images_dir, "background.bmp"))
     
-    # 新增胜利和失败图片
-    victory_img = pygame.image.load(r"\mozi_VS_aliens\images\_20250601232151.jpg")
-    defeat_img = pygame.image.load(r"\mozi_VS_aliens\images\61908196.jpg")
+    # 加载标题图片
+    title_img = pygame.image.load(os.path.join(images_dir, "background.bmp"))  # 使用背景图作为标题
+    
+    # 加载胜利和失败图片
+    victory_img = pygame.image.load(os.path.join(images_dir, "win_1.bmp"))
+    defeat_img = pygame.image.load(os.path.join(images_dir, "lose_1.bmp"))
     
     # 缩放图像以适应游戏
     player_img = pygame.transform.scale(player_img, (60, 60))
@@ -38,11 +48,11 @@ try:
     defeat_img = pygame.transform.scale(defeat_img, (300, 200))
     
     # 加载音乐
-    cover_music = r"\mozi_VS_aliens\music\xtdowner.com_219851.mp3"
+    cover_music = os.path.join(music_dir, "music_4.mp3")
     battle_musics = [
-        r"\mozi_VS_aliens\music\xtdowner.com_219841.mp3",
-        r"\mozi_VS_aliens\music\xtdowner.com_8080.mp3",
-        r"\mozi_VS_aliens\music\427256_da7-1-160.mp3"
+        os.path.join(music_dir, "music_3.mp3"),
+        os.path.join(music_dir, "music_2.mp3"),
+        os.path.join(music_dir, "music_1.mp3")
     ]
     
     # 尝试加载封面音乐
@@ -54,7 +64,7 @@ try:
         music_available = False
     
 except Exception as e:
-    print(f"ERROR: {e}")
+    print(f"错误: {e}")
     # 如果图像加载失败，创建彩色替代图像
     player_img = pygame.Surface((60, 60), pygame.SRCALPHA)
     pygame.draw.polygon(player_img, (0, 255, 255), [(30, 0), (0, 60), (60, 60)])
@@ -86,12 +96,12 @@ except Exception as e:
     victory_img = pygame.Surface((300, 200), pygame.SRCALPHA)
     pygame.draw.rect(victory_img, (100, 200, 100), (0, 0, 300, 200), border_radius=15)
     font = pygame.font.SysFont(None, 48)
-    victory_text = font.render("VICTORY!", True, (255, 255, 0))
+    victory_text = font.render("胜利!", True, (255, 255, 0))
     victory_img.blit(victory_text, (150 - victory_text.get_width()//2, 100 - victory_text.get_height()//2))
     
     defeat_img = pygame.Surface((300, 200), pygame.SRCALPHA)
     pygame.draw.rect(defeat_img, (200, 100, 100), (0, 0, 300, 200), border_radius=15)
-    defeat_text = font.render("DEFEAT", True, (255, 255, 0))
+    defeat_text = font.render("失败", True, (255, 255, 0))
     defeat_img.blit(defeat_text, (150 - defeat_text.get_width()//2, 100 - defeat_text.get_height()//2))
     
     music_available = False
@@ -292,11 +302,11 @@ def main():
     player = Player()
     
     # 创建按钮
-    level_mode_button = Button(WIDTH//2 - 100, HEIGHT//2, 200, 50, "Run mode")
-    endless_mode_button = Button(WIDTH//2 - 100, HEIGHT//2 + 70, 200, 50, "Endless mode")
-    restart_button = Button(WIDTH//2 - 100, HEIGHT//2 + 70, 200, 50, "Resume")
-    next_level_button = Button(WIDTH//2 - 100, HEIGHT//2 + 70, 200, 50, "Next Level")
-    menu_button = Button(WIDTH//2 - 100, HEIGHT//2 + 140, 200, 50, "Menu")
+    level_mode_button = Button(WIDTH//2 - 100, HEIGHT//2, 200, 50, "闯关模式")
+    endless_mode_button = Button(WIDTH//2 - 100, HEIGHT//2 + 70, 200, 50, "无尽模式")
+    restart_button = Button(WIDTH//2 - 100, HEIGHT//2 + 70, 200, 50, "重新开始")
+    next_level_button = Button(WIDTH//2 - 100, HEIGHT//2 + 70, 200, 50, "下一关")
+    menu_button = Button(WIDTH//2 - 100, HEIGHT//2 + 140, 200, 50, "返回菜单")
     
     # 游戏循环
     clock = pygame.time.Clock()
@@ -576,7 +586,7 @@ def main():
             
             # 绘制游戏模式选择
             title_font = pygame.font.SysFont(None, 48)
-            mode_title = title_font.render("Select a game mode", True, (255, 215, 0))
+            mode_title = title_font.render("选择游戏模式", True, (255, 215, 0))
             screen.blit(mode_title, (WIDTH//2 - mode_title.get_width()//2, 250))
             
             # 绘制按钮
@@ -585,15 +595,15 @@ def main():
             
             # 绘制控制提示
             controls_font = pygame.font.SysFont(None, 24)
-            controls = controls_font.render("↑↓←→,  biubiu, ESC", True, (200, 200, 255))
+            controls = controls_font.render("方向键移动，空格射击，ESC返回", True, (200, 200, 255))
             screen.blit(controls, (WIDTH//2 - controls.get_width()//2, HEIGHT - 30))
             
             # 绘制音乐控制提示
-            music_controls = controls_font.render("M: 音效 +/-: 音量", True, (150, 200, 255))
+            music_controls = controls_font.render("M: 音乐开关 +/-: 音量调节", True, (150, 200, 255))
             screen.blit(music_controls, (WIDTH//2 - music_controls.get_width()//2, HEIGHT - 60))
             
             # 绘制版本信息
-            version = controls_font.render(" 1.0 - mozi VS alien", True, (150, 150, 200))
+            version = controls_font.render("版本 1.0 - mozi VS alien", True, (150, 150, 200))
             screen.blit(version, (10, HEIGHT - 30))
         
         elif game_state in [LEVEL_MODE, ENDLESS_MODE]:
@@ -613,19 +623,19 @@ def main():
             
             # 显示分数
             font = pygame.font.SysFont(None, 36)
-            score_text = font.render(f"fraction: {score}", True, (255, 255, 0))
+            score_text = font.render(f"分数: {score}", True, (255, 255, 0))
             screen.blit(score_text, (10, 10))
             
             # 显示生命值
-            health_text = font.render(f"HP: {player.health}", True, (0, 255, 0))
+            health_text = font.render(f"生命值: {player.health}", True, (0, 255, 0))
             screen.blit(health_text, (10, 50))
             
             # 在闯关模式下显示关卡信息
             if game_state == LEVEL_MODE:
-                level_text = font.render(f"level: {current_level}/5", True, (255, 200, 0))
+                level_text = font.render(f"关卡: {current_level}/5", True, (255, 200, 0))
                 screen.blit(level_text, (WIDTH - level_text.get_width() - 10, 10))
                 
-                target_text = font.render(f"falg: {aliens_killed}/{level_targets[current_level-1]}", True, (200, 200, 255))
+                target_text = font.render(f"目标: {aliens_killed}/{level_targets[current_level-1]}", True, (200, 200, 255))
                 screen.blit(target_text, (WIDTH - target_text.get_width() - 10, 50))
             
             # 绘制标题
@@ -635,7 +645,7 @@ def main():
             
             # 绘制音乐控制提示
             controls_font = pygame.font.SysFont(None, 24)
-            music_controls = controls_font.render("M: 音效 +/-: 音量", True, (150, 200, 255))
+            music_controls = controls_font.render("M: 音乐开关 +/-: 音量调节", True, (150, 200, 255))
             screen.blit(music_controls, (WIDTH - music_controls.get_width() - 10, HEIGHT - 30))
         
         elif game_state == GAME_OVER:
@@ -649,12 +659,12 @@ def main():
             
             # 绘制游戏结束文本
             font = pygame.font.SysFont(None, 72)
-            game_over_text = font.render("GAME OVER", True, (255, 50, 50))
+            game_over_text = font.render("游戏结束", True, (255, 50, 50))
             screen.blit(game_over_text, (WIDTH//2 - game_over_text.get_width()//2, HEIGHT//3 + 180))
             
             # 绘制分数
             score_font = pygame.font.SysFont(None, 48)
-            score_text = score_font.render(f"fraction: {score}", True, (255, 255, 0))
+            score_text = score_font.render(f"最终分数: {score}", True, (255, 255, 0))
             screen.blit(score_text, (WIDTH//2 - score_text.get_width()//2, HEIGHT//2 + 50))
             
             # 绘制按钮
@@ -663,7 +673,7 @@ def main():
             
             # 绘制音乐控制提示
             controls_font = pygame.font.SysFont(None, 24)
-            music_controls = controls_font.render("M: 音效 +/-: 音量", True, (150, 200, 255))
+            music_controls = controls_font.render("M: 音乐开关 +/-: 音量调节", True, (150, 200, 255))
             screen.blit(music_controls, (WIDTH//2 - music_controls.get_width()//2, HEIGHT - 60))
         
         elif game_state == LEVEL_COMPLETE:
@@ -677,12 +687,12 @@ def main():
             
             # 绘制关卡完成文本
             font = pygame.font.SysFont(None, 72)
-            level_text = font.render(f"level {current_level} OVER!", True, (50, 255, 50))
+            level_text = font.render(f"第 {current_level} 关 完成!", True, (50, 255, 50))
             screen.blit(level_text, (WIDTH//2 - level_text.get_width()//2, HEIGHT//3 + 180))
             
             # 绘制分数
             score_font = pygame.font.SysFont(None, 48)
-            score_text = score_font.render(f"fraction: {score}", True, (255, 255, 0))
+            score_text = score_font.render(f"当前分数: {score}", True, (255, 255, 0))
             screen.blit(score_text, (WIDTH//2 - score_text.get_width()//2, HEIGHT//2 + 50))
             
             # 绘制按钮
@@ -691,7 +701,7 @@ def main():
             
             # 绘制音乐控制提示
             controls_font = pygame.font.SysFont(None, 24)
-            music_controls = controls_font.render("M: 音效 +/-: 音量", True, (150, 200, 255))
+            music_controls = controls_font.render("M: 音乐开关 +/-: 音量调节", True, (150, 200, 255))
             screen.blit(music_controls, (WIDTH//2 - music_controls.get_width()//2, HEIGHT - 60))
         
         elif game_state == GAME_COMPLETE:
@@ -705,12 +715,12 @@ def main():
             
             # 绘制游戏完成文本
             font = pygame.font.SysFont(None, 72)
-            complete_text = font.render("omeinaduo", True, (255, 215, 0))
+            complete_text = font.render("恭喜通关!", True, (255, 215, 0))
             screen.blit(complete_text, (WIDTH//2 - complete_text.get_width()//2, HEIGHT//3 + 180))
             
             # 绘制分数
             score_font = pygame.font.SysFont(None, 48)
-            score_text = score_font.render(f"fraction: {score}", True, (255, 255, 0))
+            score_text = score_font.render(f"最终分数: {score}", True, (255, 255, 0))
             screen.blit(score_text, (WIDTH//2 - score_text.get_width()//2, HEIGHT//2 + 50))
             
             # 绘制按钮
@@ -719,7 +729,7 @@ def main():
             
             # 绘制音乐控制提示
             controls_font = pygame.font.SysFont(None, 24)
-            music_controls = controls_font.render("M: 音效 +/-: 音量", True, (150, 200, 255))
+            music_controls = controls_font.render("M: 音乐开关 +/-: 音量调节", True, (150, 200, 255))
             screen.blit(music_controls, (WIDTH//2 - music_controls.get_width()//2, HEIGHT - 60))
         
         # 更新屏幕
